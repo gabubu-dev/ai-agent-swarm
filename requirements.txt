@@ -10,7 +10,6 @@ anthropic==0.18.1
 
 # Redis and async
 redis==5.0.1
-aioredis==2.0.1
 
 # Utilities
 python-dotenv==1.0.0

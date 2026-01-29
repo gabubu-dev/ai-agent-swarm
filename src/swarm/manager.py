@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
@@ -43,7 +43,7 @@ class Swarm(BaseModel):
     status: SwarmStatus = SwarmStatus.IDLE
     agent_ids: List[str] = Field(default_factory=list)
     task_ids: List[str] = Field(default_factory=list)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     config: SwarmConfig
 
 
@@ -259,7 +259,7 @@ class SwarmManager:
         
         task.status = TaskStatus.IN_PROGRESS
         task.assigned_agent = agent.agent_id
-        task.started_at = datetime.utcnow()
+        task.started_at = datetime.now(timezone.utc)
         await self.queue.update_task(task)
         
         try:
@@ -296,7 +296,7 @@ class SwarmManager:
             return  # No agents available
         
         task.status = TaskStatus.IN_PROGRESS
-        task.started_at = datetime.utcnow()
+        task.started_at = datetime.now(timezone.utc)
         await self.queue.update_task(task)
         
         # Distribute subtasks to agents

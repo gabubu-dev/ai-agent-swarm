@@ -29,7 +29,6 @@ setup(
         "openai>=1.10.0",
         "anthropic>=0.18.1",
         "redis>=5.0.1",
-        "aioredis>=2.0.1",
         "python-dotenv>=1.0.0",
         "httpx>=0.26.0",
     ],

@@ -3,13 +3,13 @@
 import asyncio
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
 import redis.asyncio as aioredis
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 logger = logging.getLogger(__name__)
 
@@ -35,15 +35,16 @@ class Task(BaseModel):
     status: TaskStatus = TaskStatus.PENDING
     assigned_agent: Optional[str] = None
     result: Optional[Dict[str, Any]] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
     priority: int = 0
 
-    class Config:
-        json_encoders = {
+    model_config = ConfigDict(
+        json_encoders={
             datetime: lambda v: v.isoformat()
         }
+    )
 
 
 class RedisQueue:
@@ -215,7 +216,7 @@ class RedisQueue:
         
         task.status = TaskStatus.COMPLETED if success else TaskStatus.FAILED
         task.result = result
-        task.completed_at = datetime.utcnow()
+        task.completed_at = datetime.now(timezone.utc)
         
         await self.update_task(task)
         

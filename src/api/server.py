@@ -27,10 +27,18 @@ swarm_manager: Optional[SwarmManager] = None
 
 def load_config() -> Dict[str, Any]:
     """Load configuration from config.json."""
-    config_path = Path("config.json")
-    if config_path.exists():
-        with open(config_path, "r") as f:
-            return json.load(f)
+    # Look for config.json in the project root (parent of src/)
+    config_paths = [
+        Path(__file__).parent.parent.parent / "config.json",  # Project root
+        Path("config.json"),  # Current working directory
+        Path.home() / ".config" / "ai-agent-swarm" / "config.json",  # User config
+    ]
+    
+    for config_path in config_paths:
+        if config_path.exists():
+            logger.info(f"Loading config from {config_path}")
+            with open(config_path, "r") as f:
+                return json.load(f)
     
     logger.warning("config.json not found, using defaults")
     return {

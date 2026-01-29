@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, Optional
 from uuid import uuid4
@@ -63,8 +63,8 @@ class Agent:
         self.status = AgentStatus.IDLE
         self.current_task: Optional[str] = None
         self.metrics = AgentMetrics()
-        self.created_at = datetime.utcnow()
-        self.last_activity = datetime.utcnow()
+        self.created_at = datetime.now(timezone.utc)
+        self.last_activity = datetime.now(timezone.utc)
         
         # Initialize AI provider
         self.provider: AIProvider = self._init_provider(provider_config or {})
@@ -116,9 +116,9 @@ class Agent:
         
         self.status = AgentStatus.BUSY
         self.current_task = task_id
-        self.last_activity = datetime.utcnow()
+        self.last_activity = datetime.now(timezone.utc)
         
-        start_time = datetime.utcnow()
+        start_time = datetime.now(timezone.utc)
         result = {
             "task_id": task_id,
             "agent_id": self.agent_id,
@@ -172,7 +172,7 @@ class Agent:
             self.status = AgentStatus.ERROR
         
         finally:
-            processing_time = (datetime.utcnow() - start_time).total_seconds()
+            processing_time = (datetime.now(timezone.utc) - start_time).total_seconds()
             result["processing_time"] = processing_time
             
             # Update metrics
@@ -186,7 +186,7 @@ class Agent:
             self.current_task = None
             if self.status != AgentStatus.ERROR:
                 self.status = AgentStatus.IDLE
-            self.last_activity = datetime.utcnow()
+            self.last_activity = datetime.now(timezone.utc)
         
         return result
 
